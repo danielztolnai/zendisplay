@@ -7,6 +7,11 @@ from PyQt5 import QtCore
 from displays import Displays
 from luminance_sources import LuminanceSourceManager
 from luminance_iio import LuminanceIIO
+from luminance_mqtt import LuminanceMQTT
+
+MQTT_HOST = None
+MQTT_TOPIC = None
+MQTT_PUBLISH = False
 
 class Controller:
     """Recommends new brightness value based on current data"""
@@ -38,6 +43,8 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         super().__init__()
         self.sensors = LuminanceSourceManager()
         self.sensors.add_source_type(LuminanceIIO)
+        self.sensors.add_source_type(LuminanceMQTT, {'topic': MQTT_TOPIC, 'host': MQTT_HOST})
+
         self.displays = Displays()
         self.controller = Controller()
 
@@ -49,6 +56,9 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.main_control)
         self.timer.start(1000)
+
+        if MQTT_PUBLISH is True:
+            self.mqtt_publisher = LuminanceMQTT(name="mqttp", path=MQTT_TOPIC, host=MQTT_HOST)
 
     def toggle_menu(self):
         """Toggle context menu visibility"""
@@ -99,6 +109,8 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         current_brightness = self.displays.get_brightness()
         recommended_brightness = self.controller.recommend_brightness(luminance, current_brightness)
         self.displays.set_brightness(recommended_brightness)
+        if MQTT_PUBLISH is True:
+            self.mqtt_publisher.publish(luminance)
 
     @classmethod
     @QtCore.pyqtSlot()
