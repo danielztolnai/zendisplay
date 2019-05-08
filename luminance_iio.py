@@ -16,6 +16,9 @@ class LuminanceIIO(LuminanceSource):
         """Find all sensors connected to the system"""
         import os
         directory = os.fsencode(cls.SYSFS_IIO_PATH)
+        if not os.path.isdir(directory):
+            return
+
         for device in os.listdir(directory):
             device_path = os.path.join(cls.SYSFS_IIO_PATH, os.fsdecode(device))
             # Check if device is an illuminance sensor
