@@ -44,7 +44,6 @@ class LuminanceMQTT(LuminanceSource):
     def on_message(self, _1, _2, msg):
         """Called when message is received from the MQTT server"""
         self.luminance = int(msg.payload)
-        print(self.luminance)
 
     def publish(self, value):
         """Publish given data to the topic of the object"""
