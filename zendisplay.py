@@ -9,6 +9,7 @@ from luminance_sources import LuminanceSourceManager
 from luminance_iio import LuminanceIIO
 from luminance_mqtt import LuminanceMQTT
 
+DEFAULT_SENSOR = 0
 MQTT_HOST = None
 MQTT_TOPIC = None
 MQTT_PUBLISH = False
@@ -44,6 +45,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         self.sensors = LuminanceSourceManager()
         self.sensors.add_source_type(LuminanceIIO)
         self.sensors.add_source_type(LuminanceMQTT, {'topic': MQTT_TOPIC, 'host': MQTT_HOST})
+        self.sensors.activate(DEFAULT_SENSOR)
 
         self.displays = Displays()
         self.controller = Controller()
