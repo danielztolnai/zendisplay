@@ -5,7 +5,8 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 from displays import Displays
-from luminance_sensors import LuminanceSensors
+from luminance_sources import LuminanceSourceManager
+from luminance_iio import LuminanceIIO
 
 class Controller:
     """Recommends new brightness value based on current data"""
@@ -35,7 +36,8 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
     """System tray icon class"""
     def __init__(self):
         super().__init__()
-        self.sensors = LuminanceSensors()
+        self.sensors = LuminanceSourceManager()
+        self.sensors.add_source_type(LuminanceIIO)
         self.displays = Displays()
         self.controller = Controller()
 
@@ -83,11 +85,11 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         sensor_menu = parent.addMenu('Sensors')
         sensor_group = QtWidgets.QActionGroup(sensor_menu, exclusive=True)
         for sensor in self.sensors:
-            action = sensor_menu.addAction(sensor['name'] + " (" + sensor['device'] + ")")
+            action = sensor_menu.addAction(sensor.name + " (" + sensor.path + ")")
             action.setCheckable(True)
-            if sensor['id'] == self.sensors.get_active():
+            if sensor.uid == self.sensors.get_active():
                 action.setChecked(True)
-            sid = sensor['id']
+            sid = sensor.uid
             action.triggered.connect(lambda state, sid=sid: self.sensors.activate(sid))
             sensor_group.addAction(action)
 
