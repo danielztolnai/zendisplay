@@ -114,6 +114,19 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         if MQTT_PUBLISH is True:
             self.mqtt_publisher.publish(luminance)
 
+    def event(self, event):
+        """Event handler for QEvent objects"""
+        if event.type() == QtCore.QEvent.Wheel:
+            new_value = None
+            if event.angleDelta().y() < 0:
+                new_value = self.sensors[self.sensors.get_active()].decrease()
+            else:
+                new_value = self.sensors[self.sensors.get_active()].increase()
+            if new_value is not None and self.supportsMessages():
+                self.showMessage('Brightness', str(new_value) + '%', msecs=500)
+            return True
+        return False
+
     @classmethod
     @QtCore.pyqtSlot()
     def action_click(cls, reason, tray):
