@@ -37,15 +37,23 @@ class Displays:
     def detect(self):
         """Find all displays connected to the system"""
         output = self.command("detect")
+        current_valid = False
 
         for line in output.splitlines():
-            line = line.strip()
-            if line.startswith('Display'):
-                self.displays.append({'id': len(self.displays), 'use': True})
-            elif line.startswith('I2C bus'):
-                self.displays[-1]['bus'] = line.split("/dev/i2c-")[1].strip()
-            elif line.startswith('Monitor:'):
-                self.displays[-1]['name'] = line.split("Monitor:")[1].strip()
+            if len(line) == 0:
+               pass
+            elif not line[0].isspace():
+                if line.startswith('Display'):
+                    self.displays.append({'id': len(self.displays), 'use': True})
+                    current_valid = True
+                else:
+                    current_valid = False
+            elif current_valid:
+                line = line.strip()
+                if line.startswith('I2C bus'):
+                    self.displays[-1]['bus'] = line.split("/dev/i2c-")[1].strip()
+                elif line.startswith('Monitor:'):
+                    self.displays[-1]['name'] = line.split("Monitor:")[1].strip()
 
     def read_brightness(self):
         """Get brightness from displays"""
