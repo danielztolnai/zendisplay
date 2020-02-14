@@ -7,6 +7,7 @@ from PyQt5 import QtCore
 from displays import Displays
 from luminance_sources import LuminanceSourceManager
 from luminance_iio import LuminanceIIO
+from luminance_manual import LuminanceManual
 from luminance_mqtt import LuminanceMQTT
 
 DEFAULT_SENSOR = 0
@@ -37,18 +38,28 @@ class Controller:
             print("(luminance: " + str(current_luminance) + " lx)")
         return recommended_brightness
 
+    def get_range(self):
+        """Calculate the full range of the controller"""
+        range_min = (0 - self.line_b) / self.line_m
+        range_max = (100 - self.line_b) / self.line_m
+        return {'min': range_min, 'max': range_max}
+
 
 class ZenDisplay(QtWidgets.QSystemTrayIcon):
     """System tray icon class"""
     def __init__(self):
         super().__init__()
+
+        self.controller = Controller()
+        self.displays = Displays()
+
         self.sensors = LuminanceSourceManager()
         self.sensors.add_source_type(LuminanceIIO)
         self.sensors.add_source_type(LuminanceMQTT, {'topic': MQTT_TOPIC, 'host': MQTT_HOST})
+        manual_parameters = self.controller.get_range()
+        manual_parameters.update({'value': self.displays.get_brightness()})
+        self.sensors.add_source_type(LuminanceManual, manual_parameters)
         self.sensors.activate(DEFAULT_SENSOR)
-
-        self.displays = Displays()
-        self.controller = Controller()
 
         self.menu = self.construct_menu()
         self.menu_visible = False
