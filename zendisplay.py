@@ -53,6 +53,10 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         self.controller = Controller()
         self.displays = Displays()
 
+        if len(self.displays) == 0:
+            print('Could not find supported displays')
+            quit()
+
         self.sensors = LuminanceSourceManager()
         self.sensors.add_source_type(LuminanceIIO)
         self.sensors.add_source_type(LuminanceMQTT, {'topic': MQTT_TOPIC, 'host': MQTT_HOST})

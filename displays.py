@@ -21,6 +21,9 @@ class Displays:
     def __getitem__(self, key):
         return self.displays[key]
 
+    def __len__(self):
+        return len(self.displays)
+
     @classmethod
     def command(cls, cmd):
         """Run a command through ddcutil"""
