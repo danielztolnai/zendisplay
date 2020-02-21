@@ -1,4 +1,5 @@
 """Get ambient lighting from IIO bus compatible sensors"""
+import os
 from luminance_sources import LuminanceSource
 
 class LuminanceIIO(LuminanceSource):
@@ -14,7 +15,6 @@ class LuminanceIIO(LuminanceSource):
     @classmethod
     def detect(cls, parameters=None):
         """Find all sensors connected to the system"""
-        import os
         directory = os.fsencode(cls.SYSFS_IIO_PATH)
         if not os.path.isdir(directory):
             return

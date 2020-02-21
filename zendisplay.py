@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Small script to adjust display brightness according to ambient lighting"""
 import os
+import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
@@ -55,7 +56,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
 
         if len(self.displays) == 0:
             print('Could not find supported displays')
-            quit()
+            sys.exit()
 
         self.sensors = LuminanceSourceManager()
         self.sensors.add_source_type(LuminanceIIO)
@@ -94,7 +95,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         # Create quit button
         menu.addSeparator()
         action_quit = menu.addAction("Quit")
-        action_quit.triggered.connect(lambda _: quit())
+        action_quit.triggered.connect(lambda _: sys.exit())
         return menu
 
     def construct_menu_displays(self, parent):

@@ -1,4 +1,6 @@
 """Wrapper module for ddcutil"""
+import subprocess
+
 class Displays:
     """Handle displays through ddcutil"""
     def __init__(self):
@@ -27,14 +29,19 @@ class Displays:
     @classmethod
     def command(cls, cmd):
         """Run a command through ddcutil"""
-        import subprocess
         command = ['ddcutil', "--brief", "--nodetect"]
         try:
             cmd = cmd.split()
         except AttributeError:
             pass
         command += cmd
-        output = subprocess.run(command, stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+
+        output = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            check=False
+        ).stdout.decode('utf-8').strip()
+
         return output
 
     def detect(self):
@@ -44,7 +51,7 @@ class Displays:
 
         for line in output.splitlines():
             if len(line) == 0:
-               pass
+                pass
             elif not line[0].isspace():
                 if line.startswith('Display'):
                     self.displays.append({'id': len(self.displays), 'use': True})

@@ -21,11 +21,9 @@ class LuminanceSource:
 
     def increase(self):
         """Increase base luminance"""
-        return None
 
     def decrease(self):
         """Decrease base luminance"""
-        return None
 
 
 class LuminanceSourceManager:

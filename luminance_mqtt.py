@@ -1,9 +1,9 @@
 """Get or provide ambient lighting data through mqtt"""
+import paho.mqtt.client as mqtt
 from luminance_sources import LuminanceSource
 
 class LuminanceMQTT(LuminanceSource):
     """Get ambient lighting information from MQTT"""
-    import paho.mqtt.client as mqtt
     PARAMETER_MQTT_HOST = 'host'
     PARAMETER_MQTT_TOPIC = 'topic'
 
@@ -11,7 +11,7 @@ class LuminanceMQTT(LuminanceSource):
         super().__init__(name, path)
         self.luminance = 0
         # Create MQTT client
-        self.client = self.mqtt.Client()
+        self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect(host, 1883, 60)

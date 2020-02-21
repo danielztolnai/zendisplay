@@ -8,11 +8,11 @@ class LuminanceManual(LuminanceSource):
     PARAMETER_LUMINANCE_MAX = 'max'
     BRIGHTNESS_INCREMENT = 5
 
-    def __init__(self, name=None, path=None, brightness=50, luminance_min=0, luminance_max=100):
+    def __init__(self, name=None, path=None, brightness=50, luminance_range=(0, 100)):
         super().__init__(name, path)
         self.brightness = brightness
-        self.luminance_min = luminance_min
-        self.luminance_max = luminance_max
+        self.luminance_min = luminance_range[0]
+        self.luminance_max = luminance_range[1]
 
     @classmethod
     def detect(cls, parameters):
@@ -24,14 +24,13 @@ class LuminanceManual(LuminanceSource):
             name="manual",
             path="manual",
             brightness=value,
-            luminance_min=value_min,
-            luminance_max=value_max
+            luminance_range=(value_min, value_max),
         )
 
     def get_luminance(self):
         """Calculate luminance data from brightness"""
-        range = self.luminance_max - self.luminance_min
-        return ((self.brightness / 100) * range) + self.luminance_min
+        luminance_range = self.luminance_max - self.luminance_min
+        return ((self.brightness / 100) * luminance_range) + self.luminance_min
 
     def increase(self):
         """Increase the luminance"""
