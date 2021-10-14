@@ -155,13 +155,20 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
 
 def main():
     """Entrypoint when running in standalone mode"""
+    def get_icon():
+        """Get theme icon or fallback to local one"""
+        icon = QtGui.QIcon.fromTheme('video-display-symbolic')
+        if icon.isNull():
+            return QtGui.QIcon(os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                "icon.png",
+            ))
+        return icon
+
     app = QtWidgets.QApplication([])
     app.setQuitOnLastWindowClosed(False)
     zendisplay = ZenDisplay()
-    zendisplay.setIcon(QtGui.QIcon(os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        "icon.png",
-    )))
+    zendisplay.setIcon(get_icon())
     zendisplay.show()
     app.exec_()
 
