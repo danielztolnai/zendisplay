@@ -1,13 +1,36 @@
-"""Wrapper module for ddcutil"""
-import subprocess
+"""Manage displays available in the system"""
+class Display:
+    """Base class for displays"""
+    def __init__(self, name=None, path=None):
+        self.uid = None
+        self.name = name
+        self.path = path
+        self.enabled = True
 
-class Displays:
-    """Handle displays through ddcutil"""
+    def enable(self):
+        """Enable the display"""
+        self.enabled = True
+
+    def disable(self):
+        """Disable the display"""
+        self.enabled = False
+
+    @classmethod
+    def detect(cls, parameters):
+        """Find all displays of this type connected to the system"""
+
+    def get_brightness(self):
+        """Get current brightness of the display"""
+
+    def set_brightness(self, brightness):
+        """Set brightness of the display"""
+
+
+class DisplayManager:
+    """Manage all displays in the system"""
     def __init__(self):
         self.iter_id = 0
         self.displays = []
-        self.detect()
-        self.read_brightness()
 
     def __iter__(self):
         self.iter_id = 0
@@ -26,70 +49,33 @@ class Displays:
     def __len__(self):
         return len(self.displays)
 
-    @classmethod
-    def command(cls, cmd):
-        """Run a command through ddcutil"""
-        command = ['ddcutil', "--brief", "--nodetect"]
-        try:
-            cmd = cmd.split()
-        except AttributeError:
-            pass
-        command += cmd
+    def add_displays_type(self, display_class, parameters=None):
+        """Find all displays of the given type connected to the system"""
+        return [self.add_display(display) for display in display_class.detect(parameters)]
 
-        output = subprocess.run(
-            command,
-            stdout=subprocess.PIPE,
-            check=False
-        ).stdout.decode('utf-8').strip()
-
-        return output
-
-    def detect(self):
-        """Find all displays connected to the system"""
-        output = self.command("detect")
-        current_valid = False
-
-        for line in output.splitlines():
-            if len(line) == 0:
-                pass
-            elif not line[0].isspace():
-                if line.startswith('Display'):
-                    self.displays.append({'id': len(self.displays), 'use': True})
-                    current_valid = True
-                else:
-                    current_valid = False
-            elif current_valid:
-                line = line.strip()
-                if line.startswith('I2C bus'):
-                    self.displays[-1]['bus'] = line.split("/dev/i2c-")[1].strip()
-                elif line.startswith('Monitor:'):
-                    self.displays[-1]['name'] = line.split("Monitor:")[1].strip()
-
-    def read_brightness(self):
-        """Get brightness from displays"""
-        for display in self.displays:
-            data = self.command(['--bus', str(display['bus']), 'getvcp', '0x10'])
-            display['brightness'] = int(data.split()[3])
+    def add_display(self, display):
+        """Add a new source"""
+        display.uid = len(self.displays)
+        self.displays.append(display)
+        return display.uid
 
     def get_brightness(self):
-        """Return last brightness value"""
+        """Return brightness value from first enabled display"""
+        brightness = None
         for display in self.displays:
-            if display['use'] is True:
-                return display['brightness']
+            brightness = display.get_brightness()
+            if brightness is not None:
+                return brightness
         return None
 
     def set_brightness(self, brightness):
         """Set brightness for displays"""
-        if brightness == self.get_brightness():
-            return
-        if brightness > 100 or brightness < 0:
-            return
-
         for display in self.displays:
-            if display['use'] is True:
-                self.command(['--bus', str(display['bus']), 'setvcp', '0x10', str(brightness)])
-                display['brightness'] = brightness
+            display.set_brightness(brightness)
 
     def set_active(self, display_id, active):
         """Include/exclude display in the used displays list"""
-        self.displays[display_id]['use'] = bool(active)
+        if bool(active):
+            self.displays[display_id].enable()
+        else:
+            self.displays[display_id].disable()

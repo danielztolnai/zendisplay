@@ -5,7 +5,8 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
-from displays import Displays
+from displays import DisplayManager
+from display_ddcutil import DisplayDDCUtil
 from luminance_sources import LuminanceSourceManager
 from luminance_iio import LuminanceIIO
 from luminance_manual import LuminanceManual
@@ -53,7 +54,9 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         super().__init__()
 
         self.controller = Controller()
-        self.displays = Displays()
+
+        self.displays = DisplayManager()
+        self.displays.add_displays_type(DisplayDDCUtil)
 
         if len(self.displays) == 0:
             print('Could not find supported displays')
@@ -103,10 +106,10 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         """Create submenu for displays"""
         display_menu = parent.addMenu('Displays')
         for display in self.displays:
-            action = display_menu.addAction(display['name'])
+            action = display_menu.addAction(display.name + " (" + display.path + ")")
             action.setCheckable(True)
-            action.setChecked(display['use'])
-            did = display['id']
+            action.setChecked(display.enabled)
+            did = display.uid
             action.triggered.connect(lambda state, did=did: self.displays.set_active(did, state))
 
     def construct_menu_sensors(self, parent):
