@@ -30,6 +30,7 @@ class DisplayDBus(Display):
 
     def __init__(self, name=None, path=None, func_rw=None):
         super().__init__(name, path)
+        self.enabled = False
         self.func_get = func_rw[0]
         self.func_set = func_rw[1]
 
