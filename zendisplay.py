@@ -12,6 +12,7 @@ from luminance_manual import LuminanceManual
 from luminance_mqtt import LuminanceMQTT
 
 DEFAULT_SENSOR = 0
+SHOW_NOTIFICATIONS = False
 MQTT_HOST = None
 MQTT_TOPIC = None
 MQTT_PUBLISH = False
@@ -139,7 +140,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
                 new_value = self.sensors[self.sensors.get_active()].decrease()
             else:
                 new_value = self.sensors[self.sensors.get_active()].increase()
-            if new_value is not None and self.supportsMessages():
+            if new_value is not None and self.supportsMessages() and SHOW_NOTIFICATIONS:
                 self.showMessage('Brightness', str(new_value) + '%', msecs=500)
             return True
         return False
