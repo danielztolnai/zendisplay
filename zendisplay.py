@@ -6,6 +6,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 from displays import DisplayManager
+from display_dbus import DisplayDBus
 from display_ddcutil import DisplayDDCUtil
 from luminance_sources import LuminanceSourceManager
 from luminance_iio import LuminanceIIO
@@ -57,6 +58,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
 
         self.displays = DisplayManager()
         self.displays.add_displays_type(DisplayDDCUtil)
+        self.displays.add_displays_type(DisplayDBus)
 
         if len(self.displays) == 0:
             print('Could not find supported displays')

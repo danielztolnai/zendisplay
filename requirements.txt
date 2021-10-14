@@ -1,1 +1,2 @@
 paho-mqtt>=1.5,<2.0
+dbus-python>=1.2.6,<1.3
