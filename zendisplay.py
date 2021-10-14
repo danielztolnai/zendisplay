@@ -153,12 +153,18 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
             tray.toggle_menu()
 
 
-APP = QtWidgets.QApplication([])
-APP.setQuitOnLastWindowClosed(False)
-ZENDISPLAY = ZenDisplay()
-ZENDISPLAY.setIcon(QtGui.QIcon(os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
-    "icon.png",
-)))
-ZENDISPLAY.show()
-APP.exec_()
+def main():
+    """Entrypoint when running in standalone mode"""
+    app = QtWidgets.QApplication([])
+    app.setQuitOnLastWindowClosed(False)
+    zendisplay = ZenDisplay()
+    zendisplay.setIcon(QtGui.QIcon(os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "icon.png",
+    )))
+    zendisplay.show()
+    app.exec_()
+
+
+if __name__ == "__main__":
+    main()
