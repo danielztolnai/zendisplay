@@ -47,6 +47,9 @@ class LuminanceSourceManager:
     def __getitem__(self, key):
         return self.sensors[key]
 
+    def __len__(self):
+        return len(self.sensors)
+
     def add_source_type(self, source_class, parameters=None):
         """Find all sensors of the given type connected to the system"""
         for source in source_class.detect(parameters):
