@@ -97,6 +97,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         menu = QtWidgets.QMenu()
         self.construct_menu_displays(menu)
         self.construct_menu_sensors(menu)
+        self.construct_menu_brightness(menu)
 
         # Create quit button
         menu.addSeparator()
@@ -124,8 +125,17 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
             if sensor.uid == self.sensors.get_active():
                 action.setChecked(True)
             sid = sensor.uid
-            action.triggered.connect(lambda state, sid=sid: self.sensors.activate(sid))
+            action.triggered.connect(lambda _, sid=sid: self.sensors.activate(sid))
             sensor_group.addAction(action)
+
+    def construct_menu_brightness(self, parent):
+        """Create submenu for the brightness setting"""
+        brightness_menu = parent.addMenu('Brightness')
+        for value in range(0, 101, 10):
+            action = brightness_menu.addAction(str(value) + "%")
+            action.triggered.connect(
+                lambda _, value=value: self.sensors[self.sensors.get_active()].set_luminance(value)
+            )
 
     def main_control(self):
         """Main control function, sets display brightness dynamically"""
