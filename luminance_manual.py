@@ -42,6 +42,6 @@ class LuminanceManual(LuminanceSource):
         self.brightness = max(self.brightness - self.BRIGHTNESS_INCREMENT, 0)
         return self.brightness
 
-    def set(self, luminance):
+    def set_luminance(self, luminance):
         """Set the luminance to a given value"""
         self.brightness = max(min(luminance, 100), 0)
