@@ -9,6 +9,7 @@ from displays import DisplayManager
 from display_dbus import DisplayDBus
 from display_ddcutil import DisplayDDCUtil
 from luminance_sources import LuminanceSourceManager
+from luminance_dbus import LuminanceDBus
 from luminance_iio import LuminanceIIO
 from luminance_manual import LuminanceManual
 from luminance_mqtt import LuminanceMQTT
@@ -65,6 +66,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
             sys.exit()
 
         self.sensors = LuminanceSourceManager()
+        self.sensors.add_source_type(LuminanceDBus)
         self.sensors.add_source_type(LuminanceIIO)
         self.sensors.add_source_type(LuminanceMQTT, {'topic': MQTT_TOPIC, 'host': MQTT_HOST})
         manual_parameters = self.controller.get_range()
