@@ -32,15 +32,29 @@ class Controller:
         value = round(self.line_m * luminance + self.line_b)
         return max(min(100, value), 0)
 
+    def brightness_should_change(self, old_brightness, new_brightness):
+        """Determine whether the brightness should be changed"""
+        if old_brightness == new_brightness:
+            return False
+
+        if new_brightness in (0, 100):
+            return True
+
+        return abs(old_brightness - new_brightness) >= self.brightness_margin
+
     def recommend_brightness(self, current_luminance, current_brightness):
         """Get a new brightness value based on current data"""
         recommended_brightness = self.calculate_brightness(current_luminance)
-        if abs(current_brightness - recommended_brightness) < self.brightness_margin:
-            recommended_brightness = current_brightness
-        else:
-            print("Brightness: ", end='')
-            print(str(current_brightness) + "% -> " + str(recommended_brightness) + "% ", end='')
-            print("(luminance: " + str(current_luminance) + " lx)")
+
+        if not self.brightness_should_change(current_brightness, recommended_brightness):
+            return current_brightness
+
+        print("Brightness: {}% -> {}% (luminance: {} lx)".format(
+            current_brightness,
+            recommended_brightness,
+            current_luminance
+        ))
+
         return recommended_brightness
 
     def get_range(self):
