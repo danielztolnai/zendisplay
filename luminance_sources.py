@@ -24,15 +24,6 @@ class LuminanceSource:
     def disable(self):
         """Disable the source"""
 
-    def increase(self):
-        """Increase base luminance"""
-
-    def decrease(self):
-        """Decrease base luminance"""
-
-    def set_luminance(self, luminance):
-        """Set base luminance"""
-
 
 class LuminanceSourceManager:
     """Handle ambient lighting sources"""

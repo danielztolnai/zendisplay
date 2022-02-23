@@ -22,10 +22,12 @@ MQTT_PUBLISH = False
 
 class Controller:
     """Recommends new brightness value based on current data"""
+    BRIGHTNESS_INCREMENT = 5
+
     def __init__(self):
         self.brightness_margin = 5
-        self.line_m = 0.1151079
-        self.line_b = 30.61871
+        self.line_m = 0.2
+        self.line_b = 0
 
     def calculate_brightness(self, luminance):
         """Calculate brightness from ambient lighting"""
@@ -57,11 +59,19 @@ class Controller:
 
         return recommended_brightness
 
-    def get_range(self):
-        """Calculate the full range of the controller"""
-        range_min = (0 - self.line_b) / self.line_m
-        range_max = (100 - self.line_b) / self.line_m
-        return {'min': range_min, 'max': range_max}
+    def set_intercept(self, value):
+        """Set the slope of the brightness function"""
+        self.line_b = value
+
+    def increase_intercept(self):
+        """Increase brightness function intercept"""
+        self.line_b = min(self.line_b + self.BRIGHTNESS_INCREMENT, 100)
+        return self.line_b
+
+    def decrease_intercept(self):
+        """Decrease brightness function intercept"""
+        self.line_b = max(self.line_b - self.BRIGHTNESS_INCREMENT, 0)
+        return self.line_b
 
 
 class ZenDisplay(QtWidgets.QSystemTrayIcon):
@@ -149,9 +159,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         brightness_menu = parent.addMenu('Brightness')
         for value in range(0, 101, 10):
             action = brightness_menu.addAction(str(value) + "%")
-            action.triggered.connect(
-                lambda _, value=value: self.sensors[self.sensors.get_active()].set_luminance(value)
-            )
+            action.triggered.connect(lambda _, value=value: self.controller.set_intercept(value))
 
     def main_control(self):
         """Main control function, sets display brightness dynamically"""
@@ -175,9 +183,9 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         if event.type() == QtCore.QEvent.Wheel:
             new_value = None
             if event.angleDelta().y() < 0:
-                new_value = self.sensors[self.sensors.get_active()].decrease()
+                new_value = self.controller.decrease_intercept()
             else:
-                new_value = self.sensors[self.sensors.get_active()].increase()
+                new_value = self.controller.increase_intercept()
             if new_value is not None and self.supportsMessages() and SHOW_NOTIFICATIONS:
                 self.showMessage('Brightness', str(new_value) + '%', msecs=500)
             return True
