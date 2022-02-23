@@ -158,6 +158,10 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         luminance = self.sensors.get_luminance()
         current_brightness = self.displays.get_brightness()
         recommended_brightness = self.controller.recommend_brightness(luminance, current_brightness)
+
+        if recommended_brightness == current_brightness:
+            return
+
         self.setToolTip('Brightness: ' + str(recommended_brightness) + '%')
         self.displays.set_brightness(recommended_brightness)
         if MQTT_PUBLISH is True:
