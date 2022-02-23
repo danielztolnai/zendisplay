@@ -49,7 +49,7 @@ class Controller:
         if not self.brightness_should_change(current_brightness, recommended_brightness):
             return current_brightness
 
-        print("Brightness: {}% -> {}% (luminance: {} lx)".format(
+        print("Brightness: {:3d}% -> {:3d}% (luminance: {:.1f} lx)".format(
             current_brightness,
             recommended_brightness,
             current_luminance
