@@ -155,6 +155,9 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
 
     def main_control(self):
         """Main control function, sets display brightness dynamically"""
+        if not self.sensors.is_ready():
+            return
+
         luminance = self.sensors.get_luminance()
         current_brightness = self.displays.get_brightness()
         recommended_brightness = self.controller.recommend_brightness(luminance, current_brightness)

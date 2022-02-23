@@ -5,10 +5,15 @@ class LuminanceSource:
         self.uid = None
         self.name = name
         self.path = path
+        self.__ready = True
 
     @classmethod
     def detect(cls, parameters):
         """Find all sources of this type connected to the system"""
+
+    def is_ready(self):
+        """Return whether the source is ready to be used"""
+        return self.__ready
 
     def get_luminance(self):
         """Get luminance from the source"""
@@ -67,6 +72,10 @@ class LuminanceSourceManager:
     def get_luminance(self):
         """Get luminance from the active sensor"""
         return self.sensors[self.active].get_luminance()
+
+    def is_ready(self):
+        """Get ready status from the active sensor"""
+        return self.sensors[self.active].is_ready()
 
     def activate(self, sensor_id):
         """Use the source with the given ID"""
