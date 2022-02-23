@@ -93,9 +93,11 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         self.sensors.add_source_type(LuminanceDBus)
         self.sensors.add_source_type(LuminanceIIO)
         self.sensors.add_source_type(LuminanceMQTT, {'topic': MQTT_TOPIC, 'host': MQTT_HOST})
-        manual_parameters = self.controller.get_range()
-        manual_parameters.update({'value': self.displays.get_brightness()})
-        self.sensors.add_source_type(LuminanceManual, manual_parameters)
+        self.sensors.add_source_type(LuminanceManual, {
+            'cb_enable': lambda: self.controller.set_intercept(self.displays.get_brightness()),
+            'cb_disable': self.controller.set_intercept,
+            'get_value': lambda: self.controller.line_b,
+        })
         self.sensors.activate(DEFAULT_SENSOR)
 
         self.menu = self.construct_menu()

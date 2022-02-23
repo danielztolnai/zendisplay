@@ -2,46 +2,37 @@
 from luminance_sources import LuminanceSource
 
 class LuminanceManual(LuminanceSource):
-    """Get ambient lighting information from user input"""
-    PARAMETER_BRIGHTNESS = 'value'
-    PARAMETER_LUMINANCE_MIN = 'min'
-    PARAMETER_LUMINANCE_MAX = 'max'
-    BRIGHTNESS_INCREMENT = 5
-
-    def __init__(self, name=None, path=None, brightness=50, luminance_range=(0, 100)):
+    """Manual luminance sensor that always returns 0 luminance"""
+    def __init__(self, name=None, path=None, parameters=None):
         super().__init__(name, path)
-        self.brightness = brightness
-        self.luminance_min = luminance_range[0]
-        self.luminance_max = luminance_range[1]
+        self.original_value = 0
+        self.callbacks = {
+            'enable': parameters['cb_enable'],
+            'disable': parameters['cb_disable'],
+            'get_value': parameters['get_value']
+        }
 
     @classmethod
     def detect(cls, parameters):
-        """Add given MQTT configuration"""
-        value = parameters[cls.PARAMETER_BRIGHTNESS]
-        value_min = parameters[cls.PARAMETER_LUMINANCE_MIN]
-        value_max = parameters[cls.PARAMETER_LUMINANCE_MAX]
-        yield cls(
-            name="manual",
-            path="manual",
-            brightness=value,
-            luminance_range=(value_min, value_max),
-        )
+        """Create manual luminance source"""
+        yield cls(name="manual", path="manual", parameters=parameters)
 
     def get_luminance(self):
-        """Calculate luminance data from brightness"""
-        luminance_range = self.luminance_max - self.luminance_min
-        return ((self.brightness / 100) * luminance_range) + self.luminance_min
+        """Manual luminance is always 0, brightness is set by controller intercept"""
+        return 0
 
-    def increase(self):
-        """Increase the luminance"""
-        self.brightness = min(self.brightness + self.BRIGHTNESS_INCREMENT, 100)
-        return self.brightness
+    def enable(self):
+        """Enable the source"""
+        self.original_value = self.__callback('get_value')
+        self.__callback('enable')
 
-    def decrease(self):
-        """Decrease the luminance"""
-        self.brightness = max(self.brightness - self.BRIGHTNESS_INCREMENT, 0)
-        return self.brightness
+    def disable(self):
+        """Disable the source"""
+        self.__callback('disable', self.original_value)
 
-    def set_luminance(self, luminance):
-        """Set the luminance to a given value"""
-        self.brightness = max(min(luminance, 100), 0)
+    def __callback(self, callback_name, *args, **kwargs):
+        """Run a callback if it is callable"""
+        callback = self.callbacks[callback_name]
+        if callable(callback):
+            return callback(*args, **kwargs)
+        return None
