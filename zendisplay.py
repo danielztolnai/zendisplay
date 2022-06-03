@@ -159,9 +159,14 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
     def construct_menu_brightness(self, parent):
         """Create submenu for the brightness setting"""
         brightness_menu = parent.addMenu('Brightness')
+        brightness_group = QtWidgets.QActionGroup(brightness_menu, exclusive=True)
         for value in range(0, 101, 10):
             action = brightness_menu.addAction(str(value) + "%")
+            action.setCheckable(True)
+            if value == 0:
+                action.setChecked(True)
             action.triggered.connect(lambda _, value=value: self.controller.set_intercept(value))
+            brightness_group.addAction(action)
 
     def main_control(self):
         """Main control function, sets display brightness dynamically"""
