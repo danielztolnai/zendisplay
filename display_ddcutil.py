@@ -8,12 +8,16 @@ class DisplayDDCUtil(Display):
         super().__init__(name, path)
         self.bus = bus
         self.brightness = None
-        self.read_brightness()
 
     @classmethod
     def detect(cls, parameters=None):
         """Find all displays connected to the system"""
-        output = cls.command("detect")
+        try:
+            output = cls.command("detect")
+        except subprocess.CalledProcessError:
+            print('ddcutil detect failed')
+            return
+
         current_valid = False
         current_bus, current_name = (None, None)
 
@@ -50,21 +54,29 @@ class DisplayDDCUtil(Display):
         output = subprocess.run(
             command,
             stdout=subprocess.PIPE,
-            check=False
+            check=True
         ).stdout.decode('utf-8').strip()
 
         return output
 
     def read_brightness(self):
         """Get brightness from the display"""
-        data = self.command(['--bus', str(self.bus), 'getvcp', '0x10'])
-        self.brightness = int(data.split()[3])
+        try:
+            data = self.command(['--bus', str(self.bus), 'getvcp', '0x10'])
+            self.brightness = int(data.split()[3])
+        except subprocess.CalledProcessError:
+            self.brightness = None
+            print('ddcutil getvcp failed')
 
     def get_brightness(self):
         """Return last brightness value"""
-        if self.enabled:
-            return self.brightness
-        return None
+        if not self.enabled:
+            return None
+
+        if self.brightness is None:
+            self.read_brightness()
+
+        return self.brightness
 
     def set_brightness(self, brightness):
         """Set brightness for displays"""
@@ -74,5 +86,8 @@ class DisplayDDCUtil(Display):
             return
 
         if self.enabled:
-            self.command(['--bus', str(self.bus), 'setvcp', '0x10', str(brightness)])
-            self.brightness = brightness
+            try:
+                self.command(['--bus', str(self.bus), 'setvcp', '0x10', str(brightness)])
+                self.brightness = brightness
+            except subprocess.CalledProcessError:
+                print('ddcutil setvcp failed')
