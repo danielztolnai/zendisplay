@@ -78,16 +78,9 @@ class DisplayDDCUtil(Display):
 
         return self.brightness
 
-    def set_brightness(self, brightness):
-        """Set brightness for displays"""
-        if brightness == self.get_brightness():
-            return
-        if brightness > 100 or brightness < 0:
-            return
-
-        if self.enabled:
-            try:
-                self.command(['--bus', str(self.bus), 'setvcp', '0x10', str(brightness)])
-                self.brightness = brightness
-            except subprocess.CalledProcessError:
-                print('ddcutil setvcp failed')
+    def _set_brightness(self, brightness):
+        try:
+            self.command(['--bus', str(self.bus), 'setvcp', '0x10', str(brightness)])
+            self.brightness = brightness
+        except subprocess.CalledProcessError:
+            print('ddcutil setvcp failed')

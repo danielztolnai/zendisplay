@@ -24,6 +24,16 @@ class Display:
 
     def set_brightness(self, brightness):
         """Set brightness of the display"""
+        if brightness == self.get_brightness():
+            return
+        if brightness > 100 or brightness < 0:
+            return
+
+        if self.enabled:
+            self._set_brightness(brightness)
+
+    def _set_brightness(self, brightness):
+        """Set brightness of the underlying device"""
 
 
 class DisplayManager:

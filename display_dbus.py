@@ -57,12 +57,5 @@ class DisplayDBus(Display):
             return int(self.func_get())
         return None
 
-    def set_brightness(self, brightness):
-        """Set brightness for display"""
-        if brightness == self.get_brightness():
-            return
-        if brightness > 100 or brightness < 0:
-            return
-
-        if self.enabled:
-            self.func_set(dbus.UInt32(brightness))
+    def _set_brightness(self, brightness):
+        self.func_set(dbus.UInt32(brightness))
