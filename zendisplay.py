@@ -58,10 +58,10 @@ class Config(configparser.ConfigParser): # pylint: disable=too-many-ancestors
         try:
             if not os.path.exists(os.path.dirname(path)):
                 os.mkdir(os.path.dirname(path), mode=0o755)
-            with open(path, 'w') as config_file:
+            with open(path, 'w', encoding='utf-8') as config_file:
                 self.write(config_file)
         except (FileNotFoundError, OSError) as exception:
-            print('Could not save configuration: {}'.format(exception))
+            print(f'Could not save configuration: {exception}')
 
 class Controller:
     """Recommends new brightness value based on current data"""
@@ -93,10 +93,10 @@ class Controller:
         if not self.brightness_should_change(current_brightness, recommended_brightness):
             return current_brightness
 
-        print("Brightness: {:3d}% -> {:3d}% (luminance: {:.1f} lx)".format(
-            current_brightness,
-            recommended_brightness,
-            current_luminance
+        print((
+            f'Brightness: {current_brightness:3d}% -> '
+            f'{recommended_brightness:3d}% '
+            f'(luminance: {current_luminance:.1f} lx)'
         ))
 
         return recommended_brightness

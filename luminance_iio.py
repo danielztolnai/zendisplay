@@ -26,12 +26,13 @@ class LuminanceIIO(LuminanceSource):
             if not os.path.isfile(os.path.join(device_path, cls.SYSFS_IIO_ILLUMINANCE_FILE)):
                 continue
             # Get name and add to list
-            with open(os.path.join(device_path, cls.SYSFS_IIO_NAME_FILE)) as file_in:
+            name_file_path = os.path.join(device_path, cls.SYSFS_IIO_NAME_FILE)
+            with open(name_file_path, encoding='utf-8') as file_in:
                 device_name = file_in.read().strip()
                 device_file = os.path.join(device_path, cls.SYSFS_IIO_ILLUMINANCE_FILE)
                 yield cls(name=device_name, path=os.fsdecode(device), file=device_file)
 
     def get_luminance(self):
         """Get luminance from the sensor"""
-        with open(self.file) as file_in:
+        with open(self.file, encoding='utf-8') as file_in:
             return int(file_in.read().strip())

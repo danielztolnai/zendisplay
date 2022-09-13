@@ -31,7 +31,7 @@ class LuminanceDBus(LuminanceSource):
 
     def sensor_connect(self):
         """Attach sensor"""
-        print('{} appeared'.format(self.name))
+        print(f'{self.name} appeared')
         self.sensor.watch_properties(self.handle_sensor_proxy_signal)
         self.sensor.interface().ClaimLight()
         self.luminance = self.sensor.get_property(self.luminance_prop)
@@ -39,7 +39,7 @@ class LuminanceDBus(LuminanceSource):
 
     def sensor_disconnect(self):
         """Detach sensor"""
-        print('{} vanished'.format(self.name))
+        print(f'{self.name} vanished')
         self._set_ready(False)
         self.sensor.watch_properties_stop()
 
