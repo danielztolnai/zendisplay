@@ -200,7 +200,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
     def construct_menu_sensors(self, parent):
         """Create submenu for sensors"""
         sensor_menu = parent.addMenu('Sensors')
-        sensor_group = QtWidgets.QActionGroup(sensor_menu, exclusive=True)
+        sensor_group = QtWidgets.QActionGroup(sensor_menu)
         for sensor in self.sensors:
             action = sensor_menu.addAction(sensor.name + " (" + sensor.path + ")")
             action.setCheckable(True)
@@ -213,7 +213,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
     def construct_menu_brightness(self, parent):
         """Create submenu for the brightness setting"""
         brightness_menu = parent.addMenu('Brightness')
-        brightness_group = QtWidgets.QActionGroup(brightness_menu, exclusive=True)
+        brightness_group = QtWidgets.QActionGroup(brightness_menu)
         for value in range(0, 101, 10):
             action = brightness_menu.addAction(str(value) + "%")
             action.setCheckable(True)
