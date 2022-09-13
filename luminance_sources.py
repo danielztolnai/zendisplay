@@ -5,7 +5,7 @@ class LuminanceSource:
         self.uid = None
         self.name = name
         self.path = path
-        self.__ready = True
+        self.__ready = False
 
     @classmethod
     def detect(cls, parameters):
@@ -23,6 +23,10 @@ class LuminanceSource:
 
     def disable(self):
         """Disable the source"""
+
+    def _set_ready(self, is_ready):
+        """Set the ready flag"""
+        self.__ready = is_ready
 
 
 class LuminanceSourceManager:

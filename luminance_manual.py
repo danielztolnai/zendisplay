@@ -5,6 +5,7 @@ class LuminanceManual(LuminanceSource):
     """Manual luminance sensor that always returns 0 luminance"""
     def __init__(self, name=None, path=None, parameters=None):
         super().__init__(name, path)
+        self._set_ready(True)
         self.original_value = 0
         self.callbacks = {
             'enable': parameters['cb_enable'],

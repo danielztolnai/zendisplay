@@ -10,6 +10,7 @@ class LuminanceIIO(LuminanceSource):
 
     def __init__(self, name=None, path=None, file=None):
         super().__init__(name, path)
+        self._set_ready(True)
         self.file = file
 
     @classmethod

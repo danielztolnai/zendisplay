@@ -8,7 +8,6 @@ class LuminanceDBus(LuminanceSource):
     """Get ambient lighting information from iio-sensor-proxy via dbus"""
     def __init__(self, name=None, path=None):
         super().__init__(name, path)
-        self.__ready = False
         self.luminance = 0
         self.luminance_prop = 'LightLevel'
 
@@ -36,12 +35,12 @@ class LuminanceDBus(LuminanceSource):
         self.sensor.watch_properties(self.handle_sensor_proxy_signal)
         self.sensor.interface().ClaimLight()
         self.luminance = self.sensor.get_property(self.luminance_prop)
-        self.__ready = True
+        self._set_ready(True)
 
     def sensor_disconnect(self):
         """Detach sensor"""
         print('{} vanished'.format(self.name))
-        self.__ready = False
+        self._set_ready(False)
         self.sensor.watch_properties_stop()
 
     def handle_sensor_proxy_signal(self, _interface_name, changed_props, _invalidated_props):
