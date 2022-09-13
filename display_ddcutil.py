@@ -44,7 +44,7 @@ class DisplayDDCUtil(Display):
     @classmethod
     def command(cls, cmd):
         """Run a command through ddcutil"""
-        command = ['ddcutil', "--brief", "--nodetect"]
+        command = ['ddcutil', "--brief"]
         try:
             cmd = cmd.split()
         except AttributeError:
