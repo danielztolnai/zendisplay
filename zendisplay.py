@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Small script to adjust display brightness according to ambient lighting"""
-import configparser
 import os
 import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
+from config import Config
 from displays import DisplayManager
 from display_dbus import DisplayDBus
 from display_ddcutil import DisplayDDCUtil
@@ -14,54 +14,6 @@ from luminance_dbus import LuminanceDBus
 from luminance_iio import LuminanceIIO
 from luminance_manual import LuminanceManual
 from luminance_mqtt import LuminanceMQTT
-
-class Config(configparser.ConfigParser): # pylint: disable=too-many-ancestors
-    """Manage configuration files"""
-    _instance = None
-    _initialized = False
-
-    def __new__(cls, *args, **kwargs):
-        if not isinstance(cls._instance, cls):
-            cls._instance = object.__new__(cls, *args, **kwargs)
-        return cls._instance
-
-    def __init__(self):
-        if self._initialized:
-            return
-        super().__init__()
-        self._load_config_file()
-        self._initialized = True
-
-    @staticmethod
-    def _get_config_file_paths():
-        """Generate config path priority list"""
-        return (
-            os.path.join(
-                os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')),
-                'zendisplay',
-                'zendisplay.conf'
-            ),
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'zendisplay.conf'),
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'zendisplay.conf.example'),
-        )
-
-    def _load_config_file(self):
-        """Read configuration"""
-        for path in self._get_config_file_paths():
-            if os.path.isfile(path):
-                self.read(path)
-                return
-
-    def save(self):
-        """Write current data to configuration file"""
-        path = self._get_config_file_paths()[0]
-        try:
-            if not os.path.exists(os.path.dirname(path)):
-                os.mkdir(os.path.dirname(path), mode=0o755)
-            with open(path, 'w', encoding='utf-8') as config_file:
-                self.write(config_file)
-        except (FileNotFoundError, OSError) as exception:
-            print(f'Could not save configuration: {exception}')
 
 class Controller:
     """Recommends new brightness value based on current data"""
