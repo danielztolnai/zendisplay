@@ -5,7 +5,7 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
-from config import Config
+from config import Config as ConfigBase
 from displays import DisplayManager
 from display_dbus import DisplayDBus
 from display_ddcutil import DisplayDDCUtil
@@ -15,13 +15,41 @@ from luminance_iio import LuminanceIIO
 from luminance_manual import LuminanceManual
 from luminance_mqtt import LuminanceMQTT
 
+class Config(ConfigBase):
+    """Manage configuration files"""
+    @staticmethod
+    def _config_name():
+        return 'zendisplay'
+
+    @staticmethod
+    def _config_defaults():
+        return {
+            'general': {
+                'default_sensor': 0,
+                'show_notifications': False,
+            },
+            'brightness': {
+                'increment': 5,
+                'margin': 5,
+                'slope': 0.2,
+                'base_value': 0,
+            },
+            'mqtt': {
+                'subscribe': False,
+                'publish': False,
+                'host': 'mqtt.example.com',
+                'topic': 'zendisplay/brightness',
+            },
+        }
+
+
 class Controller:
     """Recommends new brightness value based on current data"""
     def __init__(self):
-        self.brightness_increment = Config().getint('brightness', 'increment', fallback=5)
-        self.brightness_margin = Config().getint('brightness', 'margin', fallback=5)
-        self.line_m = Config().getfloat('brightness', 'slope', fallback=0.2)
-        self.line_b = Config().getint('brightness', 'base_value', fallback=0)
+        self.brightness_increment = Config().get('brightness', 'increment')
+        self.brightness_margin = Config().get('brightness', 'margin')
+        self.line_m = Config().get('brightness', 'slope')
+        self.line_b = Config().get('brightness', 'base_value')
 
     def calculate_brightness(self, luminance):
         """Calculate brightness from ambient lighting"""
@@ -87,7 +115,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         self.sensors = LuminanceSourceManager()
         self.sensors.add_source_type(LuminanceDBus)
         self.sensors.add_source_type(LuminanceIIO)
-        if Config().getboolean('mqtt', 'subscribe') is True:
+        if Config().get('mqtt', 'subscribe') is True:
             self.sensors.add_source_type(LuminanceMQTT, {
                 'topic': Config().get('mqtt', 'topic'),
                 'host': Config().get('mqtt', 'host'),
@@ -98,7 +126,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
             'cb_disable': self.controller.set_intercept,
             'get_value': lambda: self.controller.line_b,
         })
-        self.sensors.activate(Config().getint('general', 'default_sensor', fallback=0))
+        self.sensors.activate(Config().get('general', 'default_sensor'))
 
         self.menu = self.construct_menu()
         self.menu_visible = False
@@ -109,7 +137,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         self.timer.timeout.connect(self.main_control)
         self.timer.start(1000)
 
-        if Config().getboolean('mqtt', 'publish') is True:
+        if Config().get('mqtt', 'publish') is True:
             self.mqtt_publisher = LuminanceMQTT(
                 name="mqttp",
                 path=Config().get('mqtt', 'topic'),
@@ -169,7 +197,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
         for value in range(0, 101, 10):
             action = brightness_menu.addAction(str(value) + "%")
             action.setCheckable(True)
-            if value == Config().getint('brightness', 'base_value', fallback=0):
+            if value == Config().get('brightness', 'base_value'):
                 action.setChecked(True)
             action.triggered.connect(lambda _, value=value: self.controller.set_intercept(value))
             brightness_group.addAction(action)
@@ -188,7 +216,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
 
         self.setToolTip('Brightness: ' + str(recommended_brightness) + '%')
         self.displays.set_brightness(recommended_brightness)
-        if Config().getboolean('mqtt', 'publish') is True:
+        if Config().get('mqtt', 'publish') is True:
             self.mqtt_publisher.publish(luminance)
 
     def event(self, event):
@@ -199,7 +227,7 @@ class ZenDisplay(QtWidgets.QSystemTrayIcon):
                 new_value = self.controller.decrease_intercept()
             else:
                 new_value = self.controller.increase_intercept()
-            show_notification = Config().getboolean('general', 'show_notifications')
+            show_notification = Config().get('general', 'show_notifications')
             if new_value is not None and self.supportsMessages() and show_notification:
                 self.showMessage('Brightness', str(new_value) + '%', msecs=500)
             return True
