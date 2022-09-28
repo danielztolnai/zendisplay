@@ -12,20 +12,17 @@ class NoDefaultError(Error):
 class Config(ConfigParser):
     """Manage configuration files"""
     _instance = None
-    _initialized = False
-    _name = 'zendisplay'
+    _original_instance = None
 
     def __new__(cls, *args, **kwargs):
         if not isinstance(cls._instance, cls):
-            cls._instance = object.__new__(cls, *args, **kwargs)
+            cls._instance = cls._get_new_instance(*args, **kwargs)
         return cls._instance
 
-    def __init__(self):
-        if self._initialized:
-            return
-        super().__init__()
-        self.read(self._get_config_file_paths())
-        self._initialized = True
+    def __init__(self, initialize=False):
+        if initialize is True:
+            super().__init__()
+            self.read(self._get_config_file_paths())
 
     # pylint: disable-next=unused-argument
     def get(self, section, option, *args, fallback=_UNSET, **kwargs):
@@ -46,15 +43,42 @@ class Config(ConfigParser):
 
     def save(self):
         """Write current data to configuration file"""
+        config_changes = self._changes()
+        if config_changes is None:
+            return
+
         path = self._get_config_file_paths()[-1]
         try:
             if not os.path.exists(os.path.dirname(path)):
                 os.mkdir(os.path.dirname(path), mode=0o755)
             with open(path, 'w', encoding='utf-8') as config_file:
-                self.write(config_file)
+                config_changes.write(config_file)
+            self._original().read_dict(config_changes)
         except (FileNotFoundError, OSError) as exception:
             print(f'Could not save configuration: {exception}')
 
+    def _changes(self):
+        changes = {}
+        for section_name, section in self.items():
+            for option, value in section.items():
+                if self._original().get(section_name, option) == value:
+                    continue
+                if section_name not in changes:
+                    changes[section_name] = {}
+                changes[section_name][option] = value
+
+        if not bool(changes):
+            return None
+
+        config_changes = ConfigParser()
+        config_changes.read_dict(changes)
+        return config_changes
+
+    @classmethod
+    def _get_new_instance(cls, *args, **kwargs):
+        instance = object.__new__(cls, *args, **kwargs)
+        instance.__init__(initialize=True)
+        return instance
 
     @classmethod
     def _get_config_file_paths(cls):
@@ -68,6 +92,12 @@ class Config(ConfigParser):
                 f'{cls._config_name()}.conf'
             ),
         )
+
+    @classmethod
+    def _original(cls):
+        if not isinstance(cls._original_instance, cls):
+            cls._original_instance = cls._get_new_instance()
+        return cls._original_instance
 
     @staticmethod
     def _config_name():
