@@ -24,28 +24,8 @@ class Config(ConfigParser):
         if self._initialized:
             return
         super().__init__()
-        self._load_config_file()
+        self.read(self._get_config_file_paths())
         self._initialized = True
-
-    @classmethod
-    def _get_config_file_paths(cls):
-        """Generate config path priority list"""
-        return (
-            os.path.join(
-                os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')),
-                cls._name,
-                f'{cls._name}.conf'
-            ),
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{cls._name}.conf'),
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{cls._name}.conf.example'),
-        )
-
-    def _load_config_file(self):
-        """Read first available configuration file"""
-        for path in self._get_config_file_paths():
-            if os.path.isfile(path):
-                self.read(path)
-                return
 
     # pylint: disable-next=unused-argument
     def get(self, section, option, *args, fallback=_UNSET, **kwargs):
@@ -66,7 +46,7 @@ class Config(ConfigParser):
 
     def save(self):
         """Write current data to configuration file"""
-        path = self._get_config_file_paths()[0]
+        path = self._get_config_file_paths()[-1]
         try:
             if not os.path.exists(os.path.dirname(path)):
                 os.mkdir(os.path.dirname(path), mode=0o755)
@@ -75,6 +55,19 @@ class Config(ConfigParser):
         except (FileNotFoundError, OSError) as exception:
             print(f'Could not save configuration: {exception}')
 
+
+    @classmethod
+    def _get_config_file_paths(cls):
+        dirname = os.path.dirname(os.path.abspath(__file__))
+        return (
+            os.path.join(dirname, f'{cls._config_name()}.conf.example'),
+            os.path.join(dirname, f'{cls._config_name()}.conf'),
+            os.path.join(
+                os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')),
+                cls._config_name(),
+                f'{cls._config_name()}.conf'
+            ),
+        )
 
     @staticmethod
     def _config_name():
