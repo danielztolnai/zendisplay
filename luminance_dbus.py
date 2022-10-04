@@ -1,6 +1,5 @@
 """Get ambient lighting data through dbus from iio-sensor-proxy"""
 import dbus
-from dbus.mainloop.pyqt5 import DBusQtMainLoop
 from dbus_object import DBusObject
 from base_classes import LuminanceSource
 
@@ -12,7 +11,6 @@ class LuminanceDBus(LuminanceSource):
         self.luminance_prop = 'LightLevel'
 
         # Configure DBus connection
-        DBusQtMainLoop(set_as_default=True)
         self.bus = dbus.SystemBus()
         self.sensor = DBusObject(self.bus, 'net.hadess.SensorProxy', '/net/hadess/SensorProxy')
 
