@@ -19,7 +19,7 @@ class Controller:
         if old_brightness == new_brightness:
             return False
 
-        if new_brightness in (0, 100):
+        if new_brightness in (0, 100) or old_brightness is None:
             return True
 
         return abs(old_brightness - new_brightness) >= self.brightness_margin
@@ -32,7 +32,7 @@ class Controller:
             return current_brightness
 
         print((
-            f'Brightness: {current_brightness:3d}% -> '
+            f'Brightness: {int(current_brightness or 0):3d}% -> '
             f'{recommended_brightness:3d}% '
             f'(luminance: {current_luminance:.1f} lx)'
         ))
