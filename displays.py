@@ -52,3 +52,10 @@ class DisplayManager:
             self.displays[display_id].enable()
         else:
             self.displays[display_id].disable()
+
+    def is_ready(self):
+        """Check if any displays are ready to be controlled"""
+        for display in self.displays:
+            if display.enabled:
+                return True
+        return False
