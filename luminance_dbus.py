@@ -2,7 +2,7 @@
 import dbus
 from dbus.mainloop.pyqt5 import DBusQtMainLoop
 from dbus_object import DBusObject
-from luminance_sources import LuminanceSource
+from base_classes import LuminanceSource
 
 class LuminanceDBus(LuminanceSource):
     """Get ambient lighting information from iio-sensor-proxy via dbus"""

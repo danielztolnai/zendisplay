@@ -1,34 +1,4 @@
 """Get ambient lighting from system sensors"""
-class LuminanceSource:
-    """Base class for luminance data sources"""
-    def __init__(self, name=None, path=None):
-        self.uid = None
-        self.name = name
-        self.path = path
-        self.__ready = False
-
-    @classmethod
-    def detect(cls, parameters):
-        """Find all sources of this type connected to the system"""
-
-    def is_ready(self):
-        """Return whether the source is ready to be used"""
-        return self.__ready
-
-    def get_luminance(self):
-        """Get luminance from the source"""
-
-    def enable(self):
-        """Enable the source"""
-
-    def disable(self):
-        """Disable the source"""
-
-    def _set_ready(self, is_ready):
-        """Set the ready flag"""
-        self.__ready = is_ready
-
-
 class LuminanceSourceManager:
     """Handle ambient lighting sources"""
     def __init__(self):

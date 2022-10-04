@@ -1,6 +1,6 @@
 """Wrapper module for dbus brightness"""
 import dbus
-from displays import Display
+from base_classes import Display
 
 class DisplayDBus(Display):
     """Handle displays through dbus"""

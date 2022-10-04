@@ -1,6 +1,6 @@
 """Wrapper module for ddcutil"""
 import subprocess
-from displays import Display
+from base_classes import Display
 
 class DisplayDDCUtil(Display):
     """Handle displays through ddcutil"""

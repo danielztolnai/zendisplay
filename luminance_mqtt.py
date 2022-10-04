@@ -1,6 +1,6 @@
 """Get or provide ambient lighting data through mqtt"""
 import paho.mqtt.client as mqtt
-from luminance_sources import LuminanceSource
+from base_classes import LuminanceSource, Display
 
 class LuminanceMQTT(LuminanceSource):
     """Get ambient lighting information from MQTT"""
@@ -32,10 +32,12 @@ class LuminanceMQTT(LuminanceSource):
 
     def enable(self):
         """Enable the source"""
+        super().enable()
         self.client.loop_start()
 
     def disable(self):
         """Disable the source"""
+        super().disable()
         self.client.loop_stop(force=False)
 
     def on_connect(self, _1, _2, _3, _4):

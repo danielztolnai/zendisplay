@@ -1,6 +1,6 @@
 """Get ambient lighting from IIO bus compatible sensors"""
 import os
-from luminance_sources import LuminanceSource
+from base_classes import LuminanceSource
 
 class LuminanceIIO(LuminanceSource):
     """Handle ambient lighting sensors through sysfs"""

@@ -1,5 +1,5 @@
 """Get ambient lighting data from user input"""
-from luminance_sources import LuminanceSource
+from base_classes import LuminanceSource
 
 class LuminanceManual(LuminanceSource):
     """Manual luminance sensor that always returns 0 luminance"""
@@ -24,11 +24,13 @@ class LuminanceManual(LuminanceSource):
 
     def enable(self):
         """Enable the source"""
+        super().enable()
         self.original_value = self.__callback('get_value')
         self.__callback('enable')
 
     def disable(self):
         """Disable the source"""
+        super().disable()
         self.__callback('disable', self.original_value)
 
     def __callback(self, callback_name, *args, **kwargs):
