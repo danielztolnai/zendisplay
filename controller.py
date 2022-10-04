@@ -29,7 +29,7 @@ class Controller:
         recommended_brightness = self.calculate_brightness(current_luminance)
 
         if not self.brightness_should_change(current_brightness, recommended_brightness):
-            return current_brightness
+            return None
 
         print((
             f'Brightness: {int(current_brightness or 0):3d}% -> '
