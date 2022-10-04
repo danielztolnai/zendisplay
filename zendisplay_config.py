@@ -13,6 +13,7 @@ class Config(ConfigBase):
             'general': {
                 'default_sensor': 0,
                 'show_notifications': False,
+                'gui': 'default',
             },
             'brightness': {
                 'increment': 5,
