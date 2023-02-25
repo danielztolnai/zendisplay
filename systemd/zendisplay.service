@@ -1,5 +1,6 @@
 [Unit]
 Description=Zendisplay screen brightness manager
+After=graphical-session.target
 
 [Service]
 ExecStart=/usr/bin/env python3 -u %h/bin/zendisplay/zendisplay.py
@@ -7,6 +8,7 @@ WorkingDirectory=%h/bin/zendisplay
 Restart=on-failure
 TimeoutStopSec=20
 RestartSec=5
+SyslogIdentifier=zendisplay
 
 [Install]
 WantedBy=default.target
