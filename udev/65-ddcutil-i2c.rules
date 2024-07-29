@@ -1,1 +1,1 @@
-SUBSYSTEM=="i2c-dev", ATTRS{name}=="AMDGPU DM aux hw bus [0-9]", GROUP="i2c", MODE="0660"
+SUBSYSTEM=="i2c-dev", ATTR{name}=="AMDGPU DM [ai][u2][xc] hw bus [0-9]", GROUP="i2c-mccs", MODE="0660"
