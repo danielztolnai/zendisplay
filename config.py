@@ -1,6 +1,6 @@
 """Module to manage configuration files"""
 import os
-from configparser import ConfigParser, _UNSET, Error
+from configparser import ConfigParser, _UNSET, Error # type: ignore[attr-defined]
 
 class NoDefaultError(Error):
     """Raised when no default is present for the given option"""

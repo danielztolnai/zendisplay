@@ -47,7 +47,7 @@ class ZenDisplay(ZenDisplayBase):
         return indicator
 
     def construct_menu(self):
-        """Construct a menu from the sitemap"""
+        """Construct the menu"""
         menu = gtk.Menu()
         self.construct_menu_displays(menu)
         self.construct_menu_sensors(menu)
@@ -67,7 +67,7 @@ class ZenDisplay(ZenDisplayBase):
 
     @classmethod
     def _construct_menu_save(cls, parent):
-        """Create quit button"""
+        """Create save button"""
         action = gtk.MenuItem(label="Save settings")
         action.connect("activate", lambda _: Config().save())
         action.show()

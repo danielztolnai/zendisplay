@@ -15,6 +15,6 @@ def _get_gui_type():
 if _get_gui_type() == 'gtk':
     from zendisplay_gtk import ZenDisplay
 else:
-    from zendisplay_qt import ZenDisplay
+    from zendisplay_qt import ZenDisplay # type: ignore[misc]
 
 ZenDisplay().run()
