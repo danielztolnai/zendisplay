@@ -27,4 +27,7 @@ class Config(ConfigBase):
                 'host': 'mqtt.example.com',
                 'topic': 'zendisplay/brightness',
             },
+            'conditions': {
+                'max_brightness': '',
+            },
         }

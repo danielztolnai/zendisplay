@@ -10,6 +10,7 @@ from luminance_dbus import LuminanceDBus
 from luminance_iio import LuminanceIIO
 from luminance_manual import LuminanceManual
 from luminance_mqtt import LuminanceMQTT
+from condition_checker import ConditionChecker
 
 class ZenDisplay:
     """Automatic display brightness controller"""
@@ -19,6 +20,10 @@ class ZenDisplay:
         self.controller = Controller()
         self.displays = self._init_displays()
         self.sensors = self._init_sensors()
+        self.condition_checker = ConditionChecker(
+            lambda: self.controller.line_b,
+            self.controller.set_intercept,
+        )
 
     def run(self):
         """Run main loop"""
@@ -69,6 +74,8 @@ class ZenDisplay:
         """Main control function, sets display brightness dynamically"""
         if not self._is_ready():
             return True
+
+        self.condition_checker.run()
 
         recommended_brightness = self.controller.recommend_brightness(
             self.sensors.get_luminance(),
