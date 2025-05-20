@@ -14,3 +14,6 @@ subscribe = False
 publish = False
 host = mqtt.example.com
 topic = zendisplay/brightness
+
+#[conditions]
+#max_brightness = _NET_WM_STATE=_NET_WM_STATE_FULLSCREEN
