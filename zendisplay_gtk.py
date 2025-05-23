@@ -53,6 +53,8 @@ class ZenDisplay(ZenDisplayBase):
         self.construct_menu_sensors(menu)
         self.construct_menu_brightness(menu)
         self._construct_menu_separator(menu)
+        self._construct_menu_condition_checker(menu)
+        self._construct_menu_separator(menu)
         self._construct_menu_save(menu)
         self._construct_menu_quit(menu)
         menu.show()
@@ -64,6 +66,17 @@ class ZenDisplay(ZenDisplayBase):
         separator = gtk.SeparatorMenuItem()
         separator.show()
         parent.append(separator)
+
+    def _construct_menu_condition_checker(self, parent):
+        """Create condition checker checkbox"""
+        action = gtk.CheckMenuItem(label="Condition checker")
+        action.set_active(self.condition_checker.is_enabled())
+        action.connect(
+            'toggled',
+            lambda item: self.condition_checker.set_enabled(item.get_active())
+        )
+        action.show()
+        parent.append(action)
 
     @classmethod
     def _construct_menu_save(cls, parent):

@@ -28,6 +28,7 @@ class Config(ConfigBase):
                 'topic': 'zendisplay/brightness',
             },
             'conditions': {
+                'enabled': False,
                 'max_brightness': '',
             },
         }

@@ -17,22 +17,30 @@ class ConditionChecker():
         self.true_value = true_value
         self.cb_get = cb_get
         self.cb_set = cb_set
-        self.checker = self._init_condition_checkers(config)
+        self.config_key = config
+        self.checker = None
 
-    @staticmethod
-    def _init_condition_checkers(config: str):
-        conditions = Config().get('conditions', config)
+    def _init_condition_checkers(self):
+        conditions = Config().get('conditions', self.config_key)
         if not bool(conditions):
             return None
         return ConditionCheckerXserver(conditions)
 
-    def set_true_value(self, value: int):
-        """Change the value to set when the conditions are fulfilled"""
-        self.true_value = value
+    def is_enabled(self) -> bool:
+        """Return whether the condition is enabled"""
+        return self.checker is not None
+
+    def set_enabled(self, enabled=True):
+        """Enable/disable the condition checker"""
+        if not enabled:
+            self.checker = None
+            return
+        if not self.is_enabled():
+            self.checker = self._init_condition_checkers()
 
     def run(self):
         """Process condition changes"""
-        if self.checker is None:
+        if not self.is_enabled():
             return
 
         condition_check = self.checker.process()

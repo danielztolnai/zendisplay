@@ -54,7 +54,9 @@ class ZenDisplay(ZenDisplayBase, QtWidgets.QSystemTrayIcon):
         self.construct_menu_sensors(menu)
         self.construct_menu_brightness(menu)
 
-        # Create quit button
+        menu.addSeparator()
+        self._construct_menu_condition_checker(menu)
+
         menu.addSeparator()
         action_save = menu.addAction("Save settings")
         action_save.triggered.connect(lambda _: Config().save())
@@ -96,6 +98,13 @@ class ZenDisplay(ZenDisplayBase, QtWidgets.QSystemTrayIcon):
                 action.setChecked(True)
             action.triggered.connect(lambda _, value=value: self.controller.set_intercept(value))
             brightness_group.addAction(action)
+
+    def _construct_menu_condition_checker(self, parent):
+        """Create condition checker checkbox"""
+        action = parent.addAction("Condition checker")
+        action.setCheckable(True)
+        action.setChecked(self.condition_checker.is_enabled())
+        action.triggered.connect(self.condition_checker.set_enabled)
 
     def event(self, event):
         """Event handler for QEvent objects"""

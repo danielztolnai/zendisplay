@@ -20,10 +20,7 @@ class ZenDisplay:
         self.controller = Controller()
         self.displays = self._init_displays()
         self.sensors = self._init_sensors()
-        self.condition_checker = ConditionChecker(
-            lambda: self.controller.line_b,
-            self.controller.set_intercept,
-        )
+        self.condition_checker = self._init_condition_checker()
 
     def run(self):
         """Run main loop"""
@@ -66,6 +63,14 @@ class ZenDisplay:
         sensors.activate(Config().get('general', 'default_sensor'))
 
         return sensors
+
+    def _init_condition_checker(self):
+        condition_checker = ConditionChecker(
+            lambda: self.controller.line_b,
+            self.controller.set_intercept,
+        )
+        condition_checker.set_enabled(Config().get('conditions', 'enabled'))
+        return condition_checker
 
     def _is_ready(self):
         return self.sensors.is_ready() and self.displays.is_ready()
